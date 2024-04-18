@@ -1,0 +1,40 @@
+version: '3.8'
+
+networks:
+  postgresql_network:
+  redis_network:
+
+services:
+  postgresql:
+    image: postgres:latest
+    container_name: postgresql
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase
+    ports:
+      - "5432:5432"
+    networks:
+      - postgresql_network
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - redis_network
+
+  api:
+    build:
+      context: api_online
+      dockerfile: Dockerfile
+    container_name: api
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgresql
+      - redis
+    networks:
+      - postgresql_network
+      - redis_network
